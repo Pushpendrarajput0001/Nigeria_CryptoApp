@@ -1023,7 +1023,7 @@ app.post('/verifyAccount', async (req, res) => {
   const bankcode = req.body.bankcode;
   const params = {
     account_number: accountnumber,
-    bank_code: accountnumber,
+    bank_code: bankcode,
   };
 
   try {
