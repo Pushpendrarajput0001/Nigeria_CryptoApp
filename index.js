@@ -485,7 +485,7 @@ app.get('/fetchWatchlistData', async (req, res) => {
         coinData.push({
           name,
           symbol,
-          current_price: Number(price) * 802.5,
+          current_price: Number(price) * 896.61,
           image: imageUrl,
           percentage_change_24h: percentChange24h,
         });
@@ -555,7 +555,7 @@ app.get('/fetchtopgainersdata', async (req, res) => {
           filteredCoins.push({
             name,
             symbol,
-            current_price: Number(price) * 802.50,
+            current_price: Number(price) * 896.61,
             image: imageUrl,
             percentage_change_24h: percentChange24h,
           });
@@ -1016,15 +1016,18 @@ async function callAPI(method, url, data) {
   }
 }
 
-app.post('/verifyAccount', async (req, res) => {
+app.get('/verifyAccount', async (req, res) => {
   const apiUrl = 'http://nubapi.com/api/verify';
 
   const accountnumber = req.body.accountnumber;
   const bankcode = req.body.bankcode;
   const params = {
-    account_number: accountnumber,
-    bank_code: bankcode,
+    account_number: '2211026608',
+    bank_code: '033',
   };
+
+  console.log('AccountNumber :',accountnumber);
+  console.log('BankCode :',bankcode);
 
   try {
     const get_data = await callAPI('GET', apiUrl, params);
