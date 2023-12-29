@@ -742,16 +742,19 @@ app.get('/usdttongnprice', async (req, res) => {
 
 app.get('/getBitCoinLivePriceUsd', async (req, res) => {
   try {
-    const googleSearchURL = 'https://www.google.com/search?q=1+Bitcoin+to+USD';
-    const { data } = await axios.get(googleSearchURL);
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+      params: {
+        symbol: 'BTCUSDT', // You can change this to get prices for different cryptocurrencies
+      },
+    });
 
-    const $ = cheerio.load(data);
-    const conversionText = $('div.BNeawe.iBp4i.AP7Wnd').first().text();
-
-    const match = conversionText.match(/(\d{1,3}(?:,\d{3})*(?:\.\d+)?)/);
-    const rate = match ? match[0] : 'Not found';
-
-    res.json({ rate });
+    if (response.status === 200) {
+      const bitcoinPrice = response.data.price;
+      const rate = bitcoinPrice;
+      res.json({rate});
+    } else {
+      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data' });
   }
@@ -759,16 +762,19 @@ app.get('/getBitCoinLivePriceUsd', async (req, res) => {
 
 app.get('/getBNBLivePriceUsd', async (req, res) => {
   try {
-    const googleSearchURL = 'https://www.google.com/search?q=1+BNB+to+USD';
-    const { data } = await axios.get(googleSearchURL);
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+      params: {
+        symbol: 'BNBUSDT', // You can change this to get prices for different cryptocurrencies
+      },
+    });
 
-    const $ = cheerio.load(data);
-    const conversionText = $('div.BNeawe.iBp4i.AP7Wnd').first().text();
-
-    const match = conversionText.match(/(\d{1,3}(?:,\d{3})*(?:\.\d+)?)/);
-    const rate = match ? match[0] : 'Not found';
-
-    res.json({ rate });
+    if (response.status === 200) {
+      const bitcoinPrice = response.data.price;
+      const rate = bitcoinPrice;
+      res.json({rate});
+    } else {
+      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data' });
   }
@@ -776,16 +782,19 @@ app.get('/getBNBLivePriceUsd', async (req, res) => {
 
 app.get('/getEthereumLivePriceUsd', async (req, res) => {
   try {
-    const googleSearchURL = 'https://www.google.com/search?q=1+ETH+to+USD';
-    const { data } = await axios.get(googleSearchURL);
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+      params: {
+        symbol: 'ETHUSDT', // You can change this to get prices for different cryptocurrencies
+      },
+    });
 
-    const $ = cheerio.load(data);
-    const conversionText = $('div.BNeawe.iBp4i.AP7Wnd').first().text();
-
-    const match = conversionText.match(/(\d{1,3}(?:,\d{3})*(?:\.\d+)?)/);
-    const rate = match ? match[0] : 'Not found';
-
-    res.json({ rate });
+    if (response.status === 200) {
+      const bitcoinPrice = response.data.price;
+      const rate = bitcoinPrice;
+      res.json({rate});
+    } else {
+      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data' });
   }
@@ -1055,7 +1064,13 @@ app.get('/verifyAccount', async (req, res) => {
   }
 });
 
-
+app.get('/bitcoin-price', async (req, res) => {
+  try {
+    
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 server.listen(PORT, '192.168.29.149', () => {
   console.log(`Server is running on http://192.168.29.149:${PORT}`);
