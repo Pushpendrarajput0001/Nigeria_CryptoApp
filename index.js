@@ -37,11 +37,7 @@ const calculateTotalNairaValue = (data) => {
 app.get('/USDTtoNGNfromBinance',async(req,res)=>{
    try {
     // Make GET request to Binance API
-    const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-      params: {
-        symbol: 'USDTNGN' // USDTNGN symbol represents USD to NGN on Binance
-      }
-    });
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/price?symbol=USDTNGN')
     // Extract the price from the response data
     const usdToNgnPrice = response.data.price;
 
