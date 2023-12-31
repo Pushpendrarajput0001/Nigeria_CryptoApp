@@ -17,6 +17,7 @@ const cheerio = require('cheerio');
 const { EthHdWallet, generateMnemonic } = require("eth-hd-wallet");
 const web3 = new Web3('https://bsc-dataseed.binance.org/');
 const fetch = require('node-fetch'); // Ensure you have node-fetch or a similar library installed
+const BinanceService = require('./binanceService'); // Import the BinanceService class
 // Use CORS middleware
 app.use(cors());
 
@@ -29,27 +30,21 @@ app.use(
     extended: true,
   })
 );
+const binanceService = new BinanceService(); // Create an instance of the BinanceService
 
 const calculateTotalNairaValue = (data) => {
   return data.reduce((total, item) => total + item.nairaValue, 0);
 };
 
-app.get('/USDTtoNGNfromBinance',async(req,res)=>{
-   try {
-    // Make GET request to Binance API
-    const response = await axios.get('https://api.binance.com/api/v3/ticker/price?symbol=USDTNGN')
-    // Extract the price from the response data
-    const usdToNgnPrice = response.data.price;
-
-    var rate = parseFloat(usdToNgnPrice).toFixed(2);
-
-    // Send the price as JSON response
+app.get('/USDTtoNGNfromBinance', async (req, res) => {
+  try {
+    const rate = await binanceService.getUSDtoNGNPrice(); // Use the method from BinanceService
     res.json({ rate });
   } catch (error) {
-    // Handle any errors
-    res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
+    res.status(500).json({ error: error.message });
   }
- });
+});
+
 
 app.post("/import-wallet", async (req, res) => {
   var privateKey = req.body.privateKey;
