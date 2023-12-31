@@ -1,20 +1,22 @@
-// binanceService.js
-
 const axios = require('axios');
 
 class BinanceService {
-  async getUSDtoNGNPrice() {
+   async getUSDtoNGNPrice(callback) {
+    const url = 'https://api.binance.com/api/v3/ticker/price?symbol=USDTNGN';
+
     try {
-      const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-        params: {
-          symbol: 'USDTNGN'
-        }
-      });
+      const response = await axios.get(url);
       const usdToNgnPrice = response.data.price;
       const rate = parseFloat(usdToNgnPrice).toFixed(2);
-      return rate;
+      callback(null, rate);
     } catch (error) {
-      throw new Error('Unable to fetch USD to NGN price from Binance');
+      if (error.response) {
+        callback('Server Error: ' + error.response.status, null);
+      } else if (error.request) {
+        callback('No response from server', null);
+      } else {
+        callback('Request error: ' + error.message, null);
+      }
     }
   }
 }

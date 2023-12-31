@@ -36,14 +36,21 @@ const calculateTotalNairaValue = (data) => {
   return data.reduce((total, item) => total + item.nairaValue, 0);
 };
 
-app.get('/USDTtoNGNfromBinance', async (req, res) => {
+app.get('/USDtoNGNfromBinance', (req, res) => {
   try {
-    const rate = await binanceService.getUSDtoNGNPrice(); // Use the method from BinanceService
-    res.json({ rate });
+    const binanceService = new BinanceService();
+    binanceService.getUSDtoNGNPrice((error, rate) => {
+      if (error) {
+        res.status(500).json({ error: error });
+      } else {
+        res.json({ rate: rate });
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 app.post("/import-wallet", async (req, res) => {
