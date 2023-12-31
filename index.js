@@ -17,6 +17,8 @@ const cheerio = require('cheerio');
 const { EthHdWallet, generateMnemonic } = require("eth-hd-wallet");
 const web3 = new Web3('https://bsc-dataseed.binance.org/');
 const fetch = require('node-fetch'); // Ensure you have node-fetch or a similar library installed
+// Use CORS middleware
+app.use(cors());
 
 const HttpProvider =
   "https://eth-mainnet.g.alchemy.com/v2/3iz35aSwwC5nbTT9SyTmJ0WM916nuv70";
