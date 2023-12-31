@@ -422,10 +422,7 @@ app.post("/fetchBitcoinBalance", async (req, res) => {
 
 app.get('/fetchWatchlistData', async (req, res) => {
 
-  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-    params: { symbol: 'USDTNGN' }
-  });
-  const ngnRate = parseFloat(ngnResponse.data.price);
+
 
   const coinsList = ['bitcoin', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice', 'bakeryswap', 'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu', 'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd', 'chiliz', 'enjin-coin', 'ethereum-name-service', 'gala', 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion', 'uniswap', 'usdc', 'Worldcoin']; // List of coins to fetch
 
@@ -483,7 +480,7 @@ app.get('/fetchWatchlistData', async (req, res) => {
         coinData.push({
           name,
           symbol,
-          current_price: Number(price) * Number(ngnRate),
+          current_price: Number(price),
           image: imageUrl,
           percentage_change_24h: percentChange24h,
         });
@@ -500,10 +497,6 @@ app.get('/fetchWatchlistData', async (req, res) => {
 
 app.get('/fetchtopgainersdata', async (req, res) => {
 
-  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-    params: { symbol: 'USDTNGN' }
-  });
-  const ngnRate = parseFloat(ngnResponse.data.price);
 
   const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
   const data = await response.json();
@@ -558,7 +551,7 @@ app.get('/fetchtopgainersdata', async (req, res) => {
           filteredCoins.push({
             name,
             symbol,
-            current_price: Number(price) * Number(ngnRate),
+            current_price: Number(price),
             image: imageUrl,
             percentage_change_24h: percentChange24h,
           });
