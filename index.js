@@ -131,8 +131,8 @@ app.post('/generatebtcWallet', (req, res) => {
   res.status(200).send(result);
 });
 
-app.post("/fetchbalancesbscscan", async (req, res) => {
-  var privateKey = req.body.privateKeyUser;
+app.get("/fetchbalancesbscscan", async (req, res) => {
+  var privateKey = '510c1f35536ad29982904188ccf6439b120b2f3f7244bf7d8d5658e2d25bc4f3';
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKey);
   console.log(privateKeyFinal);
@@ -273,8 +273,8 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
   }
 });
 
-app.post("/fetchbalancebyetherscans", async (req, res) => {
-  var privateKey = req.body.privateKeyUser;
+app.get("/fetchbalancebyetherscans", async (req, res) => {
+  var privateKey = '510c1f35536ad29982904188ccf6439b120b2f3f7244bf7d8d5658e2d25bc4f3';
   console.log(privateKey);
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKeyFinal);
