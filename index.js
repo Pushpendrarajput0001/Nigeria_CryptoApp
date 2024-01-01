@@ -34,8 +34,8 @@ const calculateTotalNairaValue = (data) => {
   return data.reduce((total, item) => total + item.nairaValue, 0);
 };
 
-app.get('/USDTtoNGNfromBinance',async(req,res)=>{
-   try {
+app.get('/USDTtoNGNfromBinance', async (req, res) => {
+  try {
     // Make GET request to Binance API
     const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
       params: {
@@ -53,7 +53,7 @@ app.get('/USDTtoNGNfromBinance',async(req,res)=>{
     // Handle any errors
     res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
   }
- });
+});
 
 app.post("/import-wallet", async (req, res) => {
   var privateKey = req.body.privateKey;
@@ -431,7 +431,10 @@ app.post("/fetchBitcoinBalance", async (req, res) => {
 
 app.get('/fetchWatchlistData', async (req, res) => {
 
-
+  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+    params: { symbol: 'USDTNGN' }
+  });
+  const ngnRate = parseFloat(ngnResponse.data.price);
 
   const coinsList = ['bitcoin', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice', 'bakeryswap', 'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu', 'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd', 'chiliz', 'enjin-coin', 'ethereum-name-service', 'gala', 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion', 'uniswap', 'usdc', 'Worldcoin']; // List of coins to fetch
 
@@ -469,6 +472,8 @@ app.get('/fetchWatchlistData', async (req, res) => {
   try {
     const coinData = [];
 
+
+
     const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
     const data = await response.json();
 
@@ -489,7 +494,7 @@ app.get('/fetchWatchlistData', async (req, res) => {
         coinData.push({
           name,
           symbol,
-          current_price: Number(price),
+          current_price: Number(price) * Number(ngnRate),
           image: imageUrl,
           percentage_change_24h: percentChange24h,
         });
@@ -506,6 +511,10 @@ app.get('/fetchWatchlistData', async (req, res) => {
 
 app.get('/fetchtopgainersdata', async (req, res) => {
 
+  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+    params: { symbol: 'USDTNGN' }
+  });
+  const ngnRate = parseFloat(ngnResponse.data.price);
 
   const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
   const data = await response.json();
@@ -560,7 +569,7 @@ app.get('/fetchtopgainersdata', async (req, res) => {
           filteredCoins.push({
             name,
             symbol,
-            current_price: Number(price),
+            current_price: Number(price) * Number(ngnRate),
             image: imageUrl,
             percentage_change_24h: percentChange24h,
           });
@@ -856,7 +865,7 @@ app.post('/transferBscsScanTokensFees', async (req, res) => {
     const amountWithDecimals = web3.utils.toBN(
       web3.utils.toWei(amount.toString(), 'ether') // Convert to the smallest unit (wei)
     );
-     
+
     // Get the gas required for the token transfer
     const gas = await contract.methods.transfer(toAddress, amountWithDecimals).estimateGas({ from: fromAddress });
     console.log("Gas " + gas)
@@ -898,7 +907,7 @@ app.post('/transferEtherScanTokensFees', async (req, res) => {
     const amountWithDecimals = web3.utils.toWei(
       web3.utils.toWei(amount.toString(), 'ether') // Convert to the smallest unit (wei)
     );
-     
+
     // Get the gas required for the token transfer
     const gas = await contract.methods.transfer(toAddress, amountWithDecimals).estimateGas({ from: fromAddress });
     console.log("Gas " + gas)
@@ -1043,8 +1052,8 @@ app.get('/verifyAccount', async (req, res) => {
     bank_code: '033',
   };
 
-  console.log('AccountNumber :',accountnumber);
-  console.log('BankCode :',bankcode);
+  console.log('AccountNumber :', accountnumber);
+  console.log('BankCode :', bankcode);
 
   try {
     const get_data = await callAPI('GET', apiUrl, params);
@@ -1074,7 +1083,7 @@ app.get('/verifyAccount', async (req, res) => {
 
 app.get('/bitcoin-price', async (req, res) => {
   try {
-    
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
