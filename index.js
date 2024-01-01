@@ -1092,6 +1092,6 @@ app.get('/bitcoin-price', async (req, res) => {
 
 
 
-server.listen(PORT, '192.168.29.149', () => {
-  console.log(`Server is running on http://192.168.29.149:${PORT}`);
+server.listen(10000, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:10000`);
 });
