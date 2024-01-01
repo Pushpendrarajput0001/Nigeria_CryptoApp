@@ -1090,8 +1090,6 @@ app.get('/bitcoin-price', async (req, res) => {
 });
 
 
-
-
 server.listen(10000, '0.0.0.0', () => {
   console.log(`Server is running on http://0.0.0.0:10000`);
 });
