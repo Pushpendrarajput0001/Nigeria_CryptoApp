@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 const http = require("http");
 const Wallet = require("ethereumjs-wallet");
 const BSCSCAN_API_KEY = '3WK22B41CG3Y67YFQ6RKJIH778Z9P2Y36J';
@@ -269,7 +269,7 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
     res.status(200).json({ balances, totalNairaValue });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching token balances" });
+    res.status(500).json({ error: error });
   }
 });
 
@@ -385,7 +385,7 @@ app.post("/fetchbalancebyetherscans", async (req, res) => {
     res.status(200).json({ balances, totalNairaValue });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching token balances" });
+    res.status(500).json({ error: error });
   }
 });
 
