@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const http = require("http");
 const Wallet = require("ethereumjs-wallet");
 const BSCSCAN_API_KEY = '3WK22B41CG3Y67YFQ6RKJIH778Z9P2Y36J';
@@ -132,7 +132,7 @@ app.post('/generatebtcWallet', (req, res) => {
 });
 
 app.post("/fetchbalancesbscscan", async (req, res) => {
-  var privateKey = req.body.privateKeyUser;
+  var privateKey = '510c1f35536ad29982904188ccf6439b120b2f3f7244bf7d8d5658e2d25bc4f3';
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKey);
   console.log(privateKeyFinal);
@@ -274,7 +274,7 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
 });
 
 app.post("/fetchbalancebyetherscans", async (req, res) => {
-  var privateKey = req.body.privateKeyUser;
+  var privateKey = '510c1f35536ad29982904188ccf6439b120b2f3f7244bf7d8d5658e2d25bc4f3';
   console.log(privateKey);
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKeyFinal);
@@ -1088,6 +1088,7 @@ app.get('/bitcoin-price', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 
