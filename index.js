@@ -17,7 +17,6 @@ const cheerio = require('cheerio');
 const { EthHdWallet, generateMnemonic } = require("eth-hd-wallet");
 const web3 = new Web3('https://bsc-dataseed.binance.org/');
 const fetch = require('node-fetch'); // Ensure you have node-fetch or a similar library installed
-const BinanceService = require('./binanceService'); // Import the BinanceService class
 // Use CORS middleware
 app.use(cors());
 
@@ -30,28 +29,31 @@ app.use(
     extended: true,
   })
 );
-const binanceService = new BinanceService(); // Create an instance of the BinanceService
 
 const calculateTotalNairaValue = (data) => {
   return data.reduce((total, item) => total + item.nairaValue, 0);
 };
 
-app.get('/USDtoNGNfromBinance', (req, res) => {
-  try {
-    const binanceService = new BinanceService();
-    binanceService.getUSDtoNGNPrice((error, rate) => {
-      if (error) {
-        res.status(500).json({ error: error });
-      } else {
-        res.json({ rate: rate });
+app.get('/USDTtoNGNfromBinance',async(req,res)=>{
+   try {
+    // Make GET request to Binance API
+    const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+      params: {
+        symbol: 'USDTNGN' // USDTNGN symbol represents USD to NGN on Binance
       }
     });
+    // Extract the price from the response data
+    const usdToNgnPrice = response.data.price;
+
+    var rate = parseFloat(usdToNgnPrice).toFixed(2);
+
+    // Send the price as JSON response
+    res.json({ rate });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Handle any errors
+    res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
   }
-});
-
-
+ });
 
 app.post("/import-wallet", async (req, res) => {
   var privateKey = req.body.privateKey;
@@ -745,61 +747,64 @@ app.get('/usdttongnprice', async (req, res) => {
 
 app.get('/getBitCoinLivePriceUsd', async (req, res) => {
   try {
+    // Make GET request to Binance API
     const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
       params: {
-        symbol: 'BTCUSDT', // You can change this to get prices for different cryptocurrencies
-      },
+        symbol: 'BTCUSDT' // USDTNGN symbol represents USD to NGN on Binance
+      }
     });
+    // Extract the price from the response data
+    const usdToNgnPrice = response.data.price;
 
-    if (response.status === 200) {
-      const bitcoinPrice = response.data.price;
-      const rate = bitcoinPrice;
-      res.json({rate});
-    } else {
-      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
-    }
+    var rate = parseFloat(usdToNgnPrice).toFixed(2);
+
+    // Send the price as JSON response
+    res.json({ rate });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data' });
+    // Handle any errors
+    res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
   }
 });
 
 app.get('/getBNBLivePriceUsd', async (req, res) => {
   try {
+    // Make GET request to Binance API
     const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
       params: {
-        symbol: 'BNBUSDT', // You can change this to get prices for different cryptocurrencies
-      },
+        symbol: 'BNBUSDT' // USDTNGN symbol represents USD to NGN on Binance
+      }
     });
+    // Extract the price from the response data
+    const usdToNgnPrice = response.data.price;
 
-    if (response.status === 200) {
-      const bitcoinPrice = response.data.price;
-      const rate = bitcoinPrice;
-      res.json({rate});
-    } else {
-      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
-    }
+    var rate = parseFloat(usdToNgnPrice).toFixed(2);
+
+    // Send the price as JSON response
+    res.json({ rate });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data' });
+    // Handle any errors
+    res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
   }
 });
 
 app.get('/getEthereumLivePriceUsd', async (req, res) => {
   try {
+    // Make GET request to Binance API
     const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
       params: {
-        symbol: 'ETHUSDT', // You can change this to get prices for different cryptocurrencies
-      },
+        symbol: 'ETHUSDT' // USDTNGN symbol represents USD to NGN on Binance
+      }
     });
+    // Extract the price from the response data
+    const usdToNgnPrice = response.data.price;
 
-    if (response.status === 200) {
-      const bitcoinPrice = response.data.price;
-      const rate = bitcoinPrice;
-      res.json({rate});
-    } else {
-      res.status(500).json({ error: 'Failed to fetch Bitcoin price' });
-    }
+    var rate = parseFloat(usdToNgnPrice).toFixed(2);
+
+    // Send the price as JSON response
+    res.json({ rate });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data' });
+    // Handle any errors
+    res.status(500).json({ error: 'Unable to fetch USD to NGN price from Binance' });
   }
 });
 
