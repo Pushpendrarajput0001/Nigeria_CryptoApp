@@ -1042,7 +1042,7 @@ async function callAPI(method, url, data) {
   }
 }
 
-app.get('/verifyAccount', async (req, res) => {
+app.post('/verifyAccount', async (req, res) => {
   const apiUrl = 'http://nubapi.com/api/verify';
 
   const accountnumber = req.body.accountnumber;
@@ -1089,7 +1089,6 @@ app.get('/bitcoin-price', async (req, res) => {
   }
 });
 
-
-server.listen(10000, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:10000`);
+server.listen(3000, '192.168.29.149', () => {
+  console.log(`Server is running on http://192.168.29.149:3000`);
 });
