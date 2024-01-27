@@ -121,7 +121,7 @@ app.post("/generate-wallet", async (req, res) => {
   res.status(200).send(result);
 });
 
-app.post('/generatebtcWallet', (req, res) => {
+app.get('/generatebtcWallet', (req, res) => {
   const wallet = cw.generateWallet("BTC");
   console.log(wallet);
   const result = {
@@ -1086,6 +1086,37 @@ app.get('/bitcoin-price', async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/sendFundsToPartnerUSDT', async (req, res) => {
+  var receiptAddress = req.body.walletAddress
+  console.log("wallet address " + receiptAddress)
+  var amount = req.body.amount;
+  console.log("amount " + amount)
+  var CONTRACT_ADDRESS = '0x55d398326f99059fF775485246999027B3197955';
+  var privateKey = req.body.privateKey;
+  console.log("privateKey " + privateKey)
+
+  const abi = require("./contract.json")
+
+  const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
+  const wallet = new ethers.Wallet(privateKey, provider);
+  const amountConvert = parseUnits(amount, 18)
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
+  if (isAddress(receiptAddress)) {
+    try {
+      const tx = await contract.transfer(receiptAddress, amountConvert);
+      console.log('Transaction hash:', tx.hash);
+      return res.status(200).send(tx.hash)
+    }
+    catch (err) {
+      console.log("Insufficient Funds")
+      return res.status(401).send("Insufficient Balance")
+    }
+  }
+  else {
+    res.status(400).send("Invalid Receipt Address")
   }
 });
 
