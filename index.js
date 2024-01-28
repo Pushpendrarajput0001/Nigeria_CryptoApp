@@ -318,23 +318,43 @@ app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
     const balances = [];
 
     for (const contractAddress of contractAddresses) {
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-        const name = await contract.name();
-        const symbol = await contract.symbol();
-        const decimals = await contract.decimals();
-        const token = { name: name, symbol: symbol, decimals: decimals };
-        const balance = await contract.balanceOf(wallet.address);
-        const tokenBalance = formatEther(balance);
-        const nairaValue = tokenBalance * nairaValues[contractAddress];
-        const imageUrl = imageUrlMapping[contractAddress] || "";
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+      const name = await contract.name();
+      const symbol = await contract.symbol();
+      const decimals = await contract.decimals();
 
-        balances.push({
-          tokenName: token.name,
-          tokenSymbol: token.symbol,
-          tokenBalance: formatEther(balance),
-          nairaValue: nairaValue,
-          coinImageUrl: imageUrl, // Include the image URL for the contract
-        });
+      let tokenName = name;
+      let tokenSymbol = symbol;
+
+      // Modify coin names
+      if (tokenName.toLowerCase().includes("token")) {
+        tokenName = tokenName.replace(/token/gi, "").trim();
+      }
+
+      // Customize for BTC
+      if (contractAddress === "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c") {
+        tokenName = "BitCoin";
+        tokenSymbol = "BTC";
+      }
+
+      const token = {
+        name: tokenName,
+        symbol: tokenSymbol,
+        decimals: decimals
+      };
+
+      const balance = await contract.balanceOf(wallet.address);
+      const tokenBalance = ethers.utils.formatEther(balance);
+      const nairaValue = tokenBalance * nairaValues[contractAddress];
+      const imageUrl = imageUrlMapping[contractAddress] || "";
+
+      balances.push({
+        tokenName: token.name,
+        tokenSymbol: token.symbol,
+        tokenBalance: tokenBalance,
+        nairaValue: nairaValue,
+        coinImageUrl: imageUrl,
+      });
     }
     const totalNairaValue = calculateTotalNairaValue(balances);
     res.status(200).json({ balances, totalNairaValue });
@@ -1083,8 +1103,59 @@ app.post('/sendFundsToPartnerUSDT', async (req, res) => {
   }
 });
 
+app.post("/fetchUSDTalance", async (req, res) => {
+  var privateKey = req.body.privateKeyUser;
+  var privateKeyFinal = "0x".concat(privateKey);
+  console.log(privateKey);
+  console.log(privateKeyFinal);
+  const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
+  const contractAddressOfCoin = '0x55d398326f99059fF775485246999027B3197955';
+  // if (!privateKey) {
+  //   return res.status(400).send("Please provide a private key");
+  // }
 
-server.listen(5000, '0.0.0.0', () => {
-  console.log('Server is running on http://0.0.0.0:5000');
+  try {
+    const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
+    const wallet = new ethers.Wallet(privateKeyChecking, provider);
+    const abi = require("./contract.json");
+    //const userBnbAddress = req.body.userAddressBinance; // Get the user's BNB address from the request body
+    const balance = await provider.getBalance(wallet.address);
+    const userBNBAdress = (wallet.address);
+    const bnbBalance = formatEther(balance);
+    const contract = new ethers.Contract(contractAddressOfCoin, abi, provider);
+    const balanceOfUSDT = await contract.getBalance(wallet.address);
+    const formattedUSDT = formatEther(balanceOfUSDT);
+
+    // Check for success in the BSCScan response
+
+      // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
+     // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
+
+      const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
+
+      // Calculate the Naira value of the BNB balance
+      //const nairaValue = balance;
+
+      const balances = [];
+
+      balances.push({
+        tokenName: "Tether USDT",
+        bnbAddress: userBNBAdress,
+        tokenBalance: formattedUSDT,
+        tokenSymbol: "USDT",
+        nairaValue : '0',
+        coinImageUrl: bnbImageUrl // Include the image URL for BNB
+      });
+
+      const totalNairaValue = calculateTotalNairaValue(balances);
+      res.status(200).json({ balances, totalNairaValue });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching Binance Coin balance" });
+  }
+});
+
+server.listen(3000, '192.168.29.149', () => {
+  console.log('Server is running on http://192.168.29.149:3000');
 });
 
