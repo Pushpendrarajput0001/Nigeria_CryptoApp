@@ -306,7 +306,7 @@ app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
       "0xC762043E211571eB34f1ef377e5e8e76914962f9": "https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png",
       "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0": "https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png",
       "0x352Cb5E19b12FC216548a2677bD0fce83BaE434B": "https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png",
-      "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56": "https://s2.coinmarketcap.com/static/img/coins/64x64/8292.png",
+      "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56": "https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353",
       "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
       "0x26433c8127d9b4e9B71Eaa15111DF99Ea2EeB2f8": "https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png",
       "0x67b725d7e342d7B611fa85e859Df9697D9378B2e": "https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png",
