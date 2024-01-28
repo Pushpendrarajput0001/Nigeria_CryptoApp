@@ -1088,5 +1088,5 @@ app.post('/sendFundsToPartnerUSDT', async (req, res) => {
 });
 
 server.listen(3000, '192.168.29.149', () => {
-  console.log(`Server is running on http://192.168.29.149:3000`);
+  console.log(`Server is running on http://192.168.29.149:10000`);
 });
