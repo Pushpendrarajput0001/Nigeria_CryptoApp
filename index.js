@@ -131,7 +131,7 @@ app.get('/generatebtcWallet', (req, res) => {
   res.status(200).send(result);
 });
 
-app.get("/fetchbalancesbscscan", async (req, res) => {
+app.post("/fetchbalancesbscscan", async (req, res) => {
   const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
     params: { symbol: 'USDTNGN' }
   });
@@ -143,13 +143,13 @@ app.get("/fetchbalancesbscscan", async (req, res) => {
   console.log(privateKeyFinal);
   const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
 
-  // if (!privateKey) {
-  //   return res.status(400).send("Please provide a private key");
-  // }
+  if (!privateKey) {
+    return res.status(400).send("Please provide a private key");
+  }
 
   try {
     const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
-    const wallet = new ethers.Wallet(privateKeyChecking, provider);
+    const wallet = new ethers.Wallet(privateKeyFinal, provider);
     const abi = require("./contract.json");
 
     // Define contract addresses
@@ -256,7 +256,7 @@ app.get("/fetchbalancesbscscan", async (req, res) => {
   }
 });
 
-app.get("/fetchbalancebyBScScanSecondRound", async (req, res) => {
+app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
   var privateKey = req.body.privateKeyUser;
   console.log(privateKey);
   var privateKeyFinal = "0x".concat(privateKey);
@@ -269,7 +269,7 @@ app.get("/fetchbalancebyBScScanSecondRound", async (req, res) => {
 
   try {
     const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
-    const wallet = new ethers.Wallet(privateKeyChecking, provider);
+    const wallet = new ethers.Wallet(privateKeyFinal, provider);
     const abi = require("./contract.json");
 
     // Define contract addresses
@@ -349,6 +349,7 @@ app.post("/fetchBinanceBalance", async (req, res) => {
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKey);
   console.log(privateKeyFinal);
+  //const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
 
   if (!privateKey) {
     return res.status(400).send("Please provide a private key");
@@ -364,16 +365,14 @@ app.post("/fetchBinanceBalance", async (req, res) => {
     const bnbBalance = formatEther(balance);
 
     // Check for success in the BSCScan response
-    if (response.data.status === '1') {
-      const balance = response.data.result;
 
       // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
-      const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
+     // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
 
       const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
 
       // Calculate the Naira value of the BNB balance
-      const nairaValue = balance * bnbToNairaRate;
+      //const nairaValue = balance;
 
       const balances = [];
 
@@ -382,15 +381,12 @@ app.post("/fetchBinanceBalance", async (req, res) => {
         bnbAddress: userBNBAdress,
         tokenBalance: bnbBalance,
         tokenSymbol: "BNB",
-        nairaValue,
+        nairaValue : '0',
         coinImageUrl: bnbImageUrl // Include the image URL for BNB
       });
 
       const totalNairaValue = calculateTotalNairaValue(balances);
       res.status(200).json({ balances, totalNairaValue });
-    } else {
-      throw new Error("Invalid BNB address or BSCScan API key.");
-    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error fetching Binance Coin balance" });
@@ -1087,6 +1083,8 @@ app.post('/sendFundsToPartnerUSDT', async (req, res) => {
   }
 });
 
+
 server.listen(3000, '0.0.0.0', () => {
   console.log('Server is running on http://0.0.0.0:3000');
 });
+
