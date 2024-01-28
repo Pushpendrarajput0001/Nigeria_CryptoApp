@@ -318,43 +318,23 @@ app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
     const balances = [];
 
     for (const contractAddress of contractAddresses) {
-      const contract = new ethers.Contract(contractAddress, abi, provider);
-      const name = await contract.name();
-      const symbol = await contract.symbol();
-      const decimals = await contract.decimals();
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const name = await contract.name();
+        const symbol = await contract.symbol();
+        const decimals = await contract.decimals();
+        const token = { name: name, symbol: symbol, decimals: decimals };
+        const balance = await contract.balanceOf(wallet.address);
+        const tokenBalance = formatEther(balance);
+        const nairaValue = tokenBalance * nairaValues[contractAddress];
+        const imageUrl = imageUrlMapping[contractAddress] || "";
 
-      let tokenName = name;
-      let tokenSymbol = symbol;
-
-      // Modify coin names
-      if (tokenName.toLowerCase().includes("token")) {
-        tokenName = tokenName.replace(/token/gi, "").trim();
-      }
-
-      // Customize for BTC
-      if (contractAddress === "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c") {
-        tokenName = "BitCoin";
-        tokenSymbol = "BTC";
-      }
-
-      const token = {
-        name: tokenName,
-        symbol: tokenSymbol,
-        decimals: decimals
-      };
-
-      const balance = await contract.balanceOf(wallet.address);
-      const tokenBalance = ethers.utils.formatEther(balance);
-      const nairaValue = tokenBalance * nairaValues[contractAddress];
-      const imageUrl = imageUrlMapping[contractAddress] || "";
-
-      balances.push({
-        tokenName: token.name,
-        tokenSymbol: token.symbol,
-        tokenBalance: tokenBalance,
-        nairaValue: nairaValue,
-        coinImageUrl: imageUrl,
-      });
+        balances.push({
+          tokenName: token.name,
+          tokenSymbol: token.symbol,
+          tokenBalance: formatEther(balance),
+          nairaValue: nairaValue,
+          coinImageUrl: imageUrl, // Include the image URL for the contract
+        });
     }
     const totalNairaValue = calculateTotalNairaValue(balances);
     res.status(200).json({ balances, totalNairaValue });
