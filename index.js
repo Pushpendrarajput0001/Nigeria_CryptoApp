@@ -131,23 +131,30 @@ app.get('/generatebtcWallet', (req, res) => {
   res.status(200).send(result);
 });
 
-app.post("/fetchbalancesbscscan", async (req, res) => {
+app.get("/fetchbalancesbscscan", async (req, res) => {
+  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
+    params: { symbol: 'USDTNGN' }
+  });
+  const ngnRate = parseFloat(ngnResponse.data.price);
+
   var privateKey = req.body.privateKeyUser;
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKey);
   console.log(privateKeyFinal);
+  const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
 
-  if (!privateKey) {
-    return res.status(400).send("Please provide a private key");
-  }
+  // if (!privateKey) {
+  //   return res.status(400).send("Please provide a private key");
+  // }
 
   try {
     const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
-    const wallet = new ethers.Wallet(privateKeyFinal, provider);
+    const wallet = new ethers.Wallet(privateKeyChecking, provider);
     const abi = require("./contract.json");
 
     // Define contract addresses
     const contractAddresses = [
+      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
       "0x55d398326f99059fF775485246999027B3197955",
       "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762",
       "0xac51066d7bec65dc4589368da368b212745d63e8",
@@ -182,7 +189,8 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
     ];
 
     const nairaValues = {
-      "0x55d398326f99059fF775485246999027B3197955": 802.67,
+      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c": 5000000,
+      "0x55d398326f99059fF775485246999027B3197955": Number(ngnRate),
       "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762": 0.67,
       "0xac51066d7bec65dc4589368da368b212745d63e8": 937,
       "0xe02df9e3e622debdd69fb838bb799e3f168902c5": 228,
@@ -197,7 +205,7 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
     };
 
     const imageUrlMapping = {
-
+      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c" : "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
       "0x55d398326f99059fF775485246999027B3197955": "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
       "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762": "https://lh3.googleusercontent.com/pw/ADCreHcNa15qVOtukrRyXLPBZmQS14L1DuGOgbHlOh-v_v85uug8AQl8gHaOHcQ9iPjE-t6iDqQpkgktY-Xz0l9PL6w9zQnsHUPFK-lInDLW_aegoOVNTZoRJpXgnHU8uhpQjS8bGkguhsmy2OemKwtp0bij5ykMAmi3ga55u9BXiLZcRWGVNQKsnxnQQXTXwx1YhHpoZysSqHBbnrZEEfU87xlfxfHswfpaN-8ju9xPjOwQAynE3BOiMYNE1NMay6Jd8_leS28j30JX6XVnL6pSnxGWdnbkN1Eq7OAENrdAvWV3gg8o6mUw_BvxHhNRxbcvBYmzWRwoy8DB8oWuV6Cfy4_tywXPzRktHhdBRojF4eInxfX2t6MsVlC5XEhntLDc4FQGAdxj3DXzpV49JE45GfmQTvILcBkniQKM6i6ufn788da6vSFLfc9WCAaGd-uV8Dr87npa5MXYx-o5tkk0L4BRww5Nh5NriHHpxl8OPgIQ202eTkAG-mNj86EU1GIcxQIredyesCL4CGjMQ4pXQNQpKd1z4uYke0pxGV-KEPXqacX_2t8hkP7Dh-1DlEyv6i6N3ZmALak3fDWgIkYlzuBKWGrVcgp1osOqiZNT4rOX5uKR77G1GAsCBptTIpJPsHdyw5yfXtNqjWzjZJP3CtwNUdjSxQFCDGKbcMUdOxkiy0OrFqWC0qa_gr5_xC1-KGZ-faTmXb3zOFM8szSUftxvbOiNCIPHbdo7kv29mvf-VVEyRGJybwAiizqb-Q77rid9YeqsQu0FJ64J3mVOuHAsgSwNr3_QYBBJhjHYoGpGw-jh9NPigkPtwdjWerSK3vukvm5gcJ2C_S-YSrf7otkJ0GZuHlxqz4e8sKazy6PhVESoMwtUjoQVunhbJVzIvFv1ZzOHSdBpmkYuI3eT6QIdLkeYh2avUHtmJ_A=w297-h300-s-no-gm?authuser=0",
       "0xac51066d7bec65dc4589368da368b212745d63e8": "https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png",
@@ -248,12 +256,12 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
   }
 });
 
-app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
+app.get("/fetchbalancebyBScScanSecondRound", async (req, res) => {
   var privateKey = req.body.privateKeyUser;
   console.log(privateKey);
   var privateKeyFinal = "0x".concat(privateKey);
   console.log(privateKeyFinal);
-  //const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
+  const privateKeyChecking = '03381b277777e917ef816404a0c8421aaf55a3d5015e5cacbf346705487e6a86';
 
   // if (!privateKey) {
   //   return res.status(400).send("Please provide a private key");
@@ -261,7 +269,7 @@ app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
 
   try {
     const provider = new JsonRpcProvider("https://bsc-dataseed.binance.org/");
-    const wallet = new ethers.Wallet(privateKeyFinal, provider);
+    const wallet = new ethers.Wallet(privateKeyChecking, provider);
     const abi = require("./contract.json");
 
     // Define contract addresses
@@ -718,7 +726,7 @@ app.get('/getBitCoinLivePriceUsd', async (req, res) => {
     // Make GET request to Binance API
     const response = await axios.get('https://api.binance.com/api/v3/ticker/price', {
       params: {
-        symbol: 'BTCUSDT' // USDTNGN symbol represents USD to NGN on Binance
+        symbol: 'BTCBUSD' // USDTNGN symbol represents USD to NGN on Binance
       }
     });
     // Extract the price from the response data
