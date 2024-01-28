@@ -436,15 +436,18 @@ app.get('/fetchWatchlistData', async (req, res) => {
   });
   const ngnRate = parseFloat(ngnResponse.data.price);
 
-  const coinsList = ['bitcoin', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice', 'bakeryswap', 'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu', 'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd', 'chiliz', 'enjin-coin', 'ethereum-name-service', 'gala', 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion', 'uniswap', 'usdc', 'Worldcoin']; // List of coins to fetch
+  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice',
+    'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
+    'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
+    'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
+    'uniswap', 'usdc',]; // List of coins to fetch
 
   const imageUrlMapping = {
-    bitcoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+    'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
     ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
     cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
     tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
     'my-neighbor-alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
-    bakeryswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7064.png',
     bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
     'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
     coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
@@ -456,17 +459,12 @@ app.get('/fetchWatchlistData', async (req, res) => {
     'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
     'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
     busd: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8292.png',
-    chiliz: 'https://s2.coinmarketcap.com/static/img/coins/64x64/4066.png',
-    'enjin-coin': 'https://s2.coinmarketcap.com/static/img/coins/64x64/2130.png',
-    'ethereum-name-service': 'https://s2.coinmarketcap.com/static/img/coins/64x64/13855.png',
-    gala: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7080.png',
     chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
     decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
     'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
     'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
     uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
     usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-    worldcoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/13502.png',
   };
 
   try {
@@ -492,8 +490,8 @@ app.get('/fetchWatchlistData', async (req, res) => {
         const imageUrl = imageUrlMapping[formattedCoinName] || '';
 
         coinData.push({
-          name,
-          symbol,
+          name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
+          symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
           current_price: Number(price) * Number(ngnRate),
           image: imageUrl,
           percentage_change_24h: percentChange24h,
@@ -519,39 +517,38 @@ app.get('/fetchtopgainersdata', async (req, res) => {
   const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
   const data = await response.json();
   const coins = data.data.cryptoCurrencyList;
+  
+  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice',
+  'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
+  'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
+ 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
+    'uniswap', 'usdc',]; // List of coins to fetch
 
-  const coinsList = ['bitcoin', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice', 'bakeryswap', 'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu', 'trust-wallet', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd', 'chiliz', 'enjin-coin', 'ethereum-name-service', 'gala', 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion', 'uniswap', 'usdc', 'Worldcoin']; // List of coins to fetch
-
-  const imageUrlMapping = {
-    bitcoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-    ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-    cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
-    tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-    'my-neighbor-alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
-    bakeryswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7064.png',
-    bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
-    'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
-    coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
-    pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
-    polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
-    'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
-    'trust-wallet': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
-    apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
-    'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
-    'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
-    busd: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8292.png',
-    chiliz: 'https://s2.coinmarketcap.com/static/img/coins/64x64/4066.png',
-    'enjin-coin': 'https://s2.coinmarketcap.com/static/img/coins/64x64/2130.png',
-    'ethereum-name-service': 'https://s2.coinmarketcap.com/static/img/coins/64x64/13855.png',
-    gala: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7080.png',
-    chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
-    decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
-    'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
-    'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
-    uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
-    usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-    worldcoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/13502.png',
-  };
+    const imageUrlMapping = {
+      'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+      ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+      cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
+      tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+      'my-neighbor-alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
+      bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
+      'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
+      coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
+      pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
+      polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
+      'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
+      'trust-wallet': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
+      apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
+      'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
+      'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
+      busd: 'https://s2.coinmarketcap.com/static/img/coins/64x64/8292.png',
+      chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
+      decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
+      'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
+      'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
+      uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
+      usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+    };
+  
 
   try {
     const filteredCoins = [];
@@ -567,8 +564,8 @@ app.get('/fetchtopgainersdata', async (req, res) => {
 
         if (percentChange24h > 0) { // Filter coins with positive percentage change
           filteredCoins.push({
-            name,
-            symbol,
+            name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
+            symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
             current_price: Number(price) * Number(ngnRate),
             image: imageUrl,
             percentage_change_24h: percentChange24h,
