@@ -488,12 +488,13 @@ app.get('/fetchWatchlistData', async (req, res) => {
         const { name, symbol, quotes } = coinSlug;
         const { price, percentChange24h } = quotes.find((quote) => quote.name === 'USD') || { price: 0, percentChange24h: 0 };
         const imageUrl = imageUrlMapping[formattedCoinName] || '';
+        const finalImageUrl = coinName === 'bitcoin-BEP2' ? imageUrlMapping['bitcoin-BEP2'] : imageUrl; // Updated image URL for bitcoin-BEP2
 
         coinData.push({
           name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
           symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
           current_price: Number(price) * Number(ngnRate),
-          image: imageUrl,
+          image: finalImageUrl,
           percentage_change_24h: percentChange24h,
         });
       }
@@ -563,11 +564,12 @@ app.get('/fetchtopgainersdata', async (req, res) => {
         const imageUrl = imageUrlMapping[formattedCoinName] || '';
 
         if (percentChange24h > 0) { // Filter coins with positive percentage change
+          const finalImageUrl = coinName === 'bitcoin-BEP2' ? imageUrlMapping['bitcoin-BEP2'] : imageUrl; // Updated image URL for bitcoin-BEP2
           filteredCoins.push({
             name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
             symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
             current_price: Number(price) * Number(ngnRate),
-            image: imageUrl,
+            image: finalImageUrl,
             percentage_change_24h: percentChange24h,
           });
         }
