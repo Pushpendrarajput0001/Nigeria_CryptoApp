@@ -396,7 +396,7 @@ app.get('/fetchWatchlistData', async (req, res) => {
   });
   const ngnRate = parseFloat(ngnResponse.data.price);
 
-  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice',
+  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
     'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
     'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
     'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
@@ -407,7 +407,7 @@ app.get('/fetchWatchlistData', async (req, res) => {
     ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
     cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
     tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-    'my-neighbor-alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
+    'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
     bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
     'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
     coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
@@ -479,7 +479,7 @@ app.get('/fetchtopgainersdata', async (req, res) => {
   const data = await response.json();
   const coins = data.data.cryptoCurrencyList;
   
-  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'my-neighbor-alice',
+  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
   'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
   'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
  'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
@@ -490,7 +490,7 @@ app.get('/fetchtopgainersdata', async (req, res) => {
       ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
       cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
       tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-      'my-neighbor-alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
+      'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
       bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
       'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
       coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
