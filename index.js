@@ -17,6 +17,8 @@ const cheerio = require('cheerio');
 const { EthHdWallet, generateMnemonic } = require("eth-hd-wallet");
 const web3 = new Web3('https://bsc-dataseed.binance.org/');
 const fetch = require('node-fetch'); // Ensure you have node-fetch or a similar library installed
+const Biconomy = require('@biconomy/mexa');
+
 // Use CORS middleware
 app.use(cors());
 
@@ -205,7 +207,7 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
     };
 
     const imageUrlMapping = {
-      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c" : "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
+      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c": "https://s2.coinmarketcap.com/static/img/coins/64x64/1.png",
       "0x55d398326f99059fF775485246999027B3197955": "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
       "0xB7d9905eDf8B7B093E3C74af8d6982D0F3d37762": "https://lh3.googleusercontent.com/pw/ADCreHcNa15qVOtukrRyXLPBZmQS14L1DuGOgbHlOh-v_v85uug8AQl8gHaOHcQ9iPjE-t6iDqQpkgktY-Xz0l9PL6w9zQnsHUPFK-lInDLW_aegoOVNTZoRJpXgnHU8uhpQjS8bGkguhsmy2OemKwtp0bij5ykMAmi3ga55u9BXiLZcRWGVNQKsnxnQQXTXwx1YhHpoZysSqHBbnrZEEfU87xlfxfHswfpaN-8ju9xPjOwQAynE3BOiMYNE1NMay6Jd8_leS28j30JX6XVnL6pSnxGWdnbkN1Eq7OAENrdAvWV3gg8o6mUw_BvxHhNRxbcvBYmzWRwoy8DB8oWuV6Cfy4_tywXPzRktHhdBRojF4eInxfX2t6MsVlC5XEhntLDc4FQGAdxj3DXzpV49JE45GfmQTvILcBkniQKM6i6ufn788da6vSFLfc9WCAaGd-uV8Dr87npa5MXYx-o5tkk0L4BRww5Nh5NriHHpxl8OPgIQ202eTkAG-mNj86EU1GIcxQIredyesCL4CGjMQ4pXQNQpKd1z4uYke0pxGV-KEPXqacX_2t8hkP7Dh-1DlEyv6i6N3ZmALak3fDWgIkYlzuBKWGrVcgp1osOqiZNT4rOX5uKR77G1GAsCBptTIpJPsHdyw5yfXtNqjWzjZJP3CtwNUdjSxQFCDGKbcMUdOxkiy0OrFqWC0qa_gr5_xC1-KGZ-faTmXb3zOFM8szSUftxvbOiNCIPHbdo7kv29mvf-VVEyRGJybwAiizqb-Q77rid9YeqsQu0FJ64J3mVOuHAsgSwNr3_QYBBJhjHYoGpGw-jh9NPigkPtwdjWerSK3vukvm5gcJ2C_S-YSrf7otkJ0GZuHlxqz4e8sKazy6PhVESoMwtUjoQVunhbJVzIvFv1ZzOHSdBpmkYuI3eT6QIdLkeYh2avUHtmJ_A=w297-h300-s-no-gm?authuser=0",
       "0xac51066d7bec65dc4589368da368b212745d63e8": "https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png",
@@ -223,30 +225,30 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
     const balances = [];
 
     for (const contractAddress of contractAddresses) {
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-        const name = await contract.name();
-        const symbol = await contract.symbol();
-        const decimals = await contract.decimals();
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+      const name = await contract.name();
+      const symbol = await contract.symbol();
+      const decimals = await contract.decimals();
 
-        const token = {
-          name: name,
-          symbol: symbol,
-          decimals: decimals
-        };
+      const token = {
+        name: name,
+        symbol: symbol,
+        decimals: decimals
+      };
 
-        const balance = await contract.balanceOf(wallet.address);
-        const tokenBalance = formatEther(balance);
-        const nairaValue = tokenBalance * nairaValues[contractAddress];
-        const imageUrl = imageUrlMapping[contractAddress] || "";
+      const balance = await contract.balanceOf(wallet.address);
+      const tokenBalance = formatEther(balance);
+      const nairaValue = tokenBalance * nairaValues[contractAddress];
+      const imageUrl = imageUrlMapping[contractAddress] || "";
 
-        balances.push({
-          tokenName: token.name,
-          tokenSymbol: token.symbol,
-          tokenBalance: formatEther(balance),
-          nairaValue: nairaValue,
-          coinImageUrl: imageUrl, // Include the image URL for the contract
-        });
-      }
+      balances.push({
+        tokenName: token.name,
+        tokenSymbol: token.symbol,
+        tokenBalance: formatEther(balance),
+        nairaValue: nairaValue,
+        coinImageUrl: imageUrl, // Include the image URL for the contract
+      });
+    }
 
     const totalNairaValue = calculateTotalNairaValue(balances);
     res.status(200).json({ balances, totalNairaValue });
@@ -318,23 +320,23 @@ app.post("/fetchbalancebyBScScanSecondRound", async (req, res) => {
     const balances = [];
 
     for (const contractAddress of contractAddresses) {
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-        const name = await contract.name();
-        const symbol = await contract.symbol();
-        const decimals = await contract.decimals();
-        const token = { name: name, symbol: symbol, decimals: decimals };
-        const balance = await contract.balanceOf(wallet.address);
-        const tokenBalance = formatEther(balance);
-        const nairaValue = tokenBalance * nairaValues[contractAddress];
-        const imageUrl = imageUrlMapping[contractAddress] || "";
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+      const name = await contract.name();
+      const symbol = await contract.symbol();
+      const decimals = await contract.decimals();
+      const token = { name: name, symbol: symbol, decimals: decimals };
+      const balance = await contract.balanceOf(wallet.address);
+      const tokenBalance = formatEther(balance);
+      const nairaValue = tokenBalance * nairaValues[contractAddress];
+      const imageUrl = imageUrlMapping[contractAddress] || "";
 
-        balances.push({
-          tokenName: token.name,
-          tokenSymbol: token.symbol,
-          tokenBalance: formatEther(balance),
-          nairaValue: nairaValue,
-          coinImageUrl: imageUrl, // Include the image URL for the contract
-        });
+      balances.push({
+        tokenName: token.name,
+        tokenSymbol: token.symbol,
+        tokenBalance: formatEther(balance),
+        nairaValue: nairaValue,
+        coinImageUrl: imageUrl, // Include the image URL for the contract
+      });
     }
     const totalNairaValue = calculateTotalNairaValue(balances);
     res.status(200).json({ balances, totalNairaValue });
@@ -366,27 +368,27 @@ app.post("/fetchBinanceBalance", async (req, res) => {
 
     // Check for success in the BSCScan response
 
-      // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
-     // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
+    // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
+    // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
 
-      const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
+    const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
 
-      // Calculate the Naira value of the BNB balance
-      //const nairaValue = balance;
+    // Calculate the Naira value of the BNB balance
+    //const nairaValue = balance;
 
-      const balances = [];
+    const balances = [];
 
-      balances.push({
-        tokenName: "Binance Coin",
-        bnbAddress: userBNBAdress,
-        tokenBalance: bnbBalance,
-        tokenSymbol: "BNB",
-        nairaValue : '0',
-        coinImageUrl: bnbImageUrl // Include the image URL for BNB
-      });
+    balances.push({
+      tokenName: "Binance Coin",
+      bnbAddress: userBNBAdress,
+      tokenBalance: bnbBalance,
+      tokenSymbol: "BNB",
+      nairaValue: '0',
+      coinImageUrl: bnbImageUrl // Include the image URL for BNB
+    });
 
-      const totalNairaValue = calculateTotalNairaValue(balances);
-      res.status(200).json({ balances, totalNairaValue });
+    const totalNairaValue = calculateTotalNairaValue(balances);
+    res.status(200).json({ balances, totalNairaValue });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error fetching Binance Coin balance" });
@@ -482,38 +484,38 @@ app.get('/fetchtopgainersdata', async (req, res) => {
   const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
   const data = await response.json();
   const coins = data.data.cryptoCurrencyList;
-  
+
   const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
-  'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
-  'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
- 'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
+    'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
+    'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
+    'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
     'uniswap', 'usdc',]; // List of coins to fetch
 
-    const imageUrlMapping = {
-      'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-      ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-      cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
-      tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-      'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
-      bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
-      'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
-      coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
-      pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
-      polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
-      'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
-      'Trust-Wallet-Token': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
-      apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
-      'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
-      'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
-      busd: 'https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353',
-      chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
-      decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
-      'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
-      'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
-      uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
-      usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-    };
-  
+  const imageUrlMapping = {
+    'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+    ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+    cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
+    tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+    'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
+    bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
+    'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
+    coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
+    pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
+    polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
+    'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
+    'Trust-Wallet-Token': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
+    apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
+    'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
+    'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
+    busd: 'https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353',
+    chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
+    decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
+    'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
+    'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
+    uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
+    usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+  };
+
 
   try {
     const filteredCoins = [];
@@ -1108,31 +1110,252 @@ app.post("/fetchUSDTalance", async (req, res) => {
 
     // Check for success in the BSCScan response
 
-      // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
-     // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
+    // Get current BNB to Nigerian Naira conversion rate (replace this value with the actual rate)
+    // const bnbToNairaRate = 125000; // Replace this with the actual rate fetched from an API or service
 
-      const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
+    const bnbImageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png"; // Replace with the actual BNB image URL
 
-      // Calculate the Naira value of the BNB balance
-      //const nairaValue = balance;
+    // Calculate the Naira value of the BNB balance
+    //const nairaValue = balance;
 
-      const balances = [];
+    const balances = [];
 
-      balances.push({
-        tokenName: "Tether USDT",
-        bnbAddress: userBNBAdress,
-        tokenBalance: formattedUSDT,
-        tokenSymbol: "USDT",
-        nairaValue : '0',
-        coinImageUrl: bnbImageUrl // Include the image URL for BNB
-      });
+    balances.push({
+      tokenName: "Tether USDT",
+      bnbAddress: userBNBAdress,
+      tokenBalance: formattedUSDT,
+      tokenSymbol: "USDT",
+      nairaValue: '0',
+      coinImageUrl: bnbImageUrl // Include the image URL for BNB
+    });
 
-      const totalNairaValue = calculateTotalNairaValue(balances);
-      res.status(200).json({ balances, totalNairaValue });
+    const totalNairaValue = calculateTotalNairaValue(balances);
+    res.status(200).json({ balances, totalNairaValue });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error fetching Binance Coin balance" });
   }
+});
+
+app.get('/swapGasless', async (req, res) => {
+  const bscNodeURL = 'https://bsc-dataseed.binance.org/'; // Replace with the BSC node URL
+  const web3 = new Web3(bscNodeURL);
+
+  const routerAddress = '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F'; // PancakeSwap router address on BSC
+  const routerABI = require("./contract.json");
+
+  const privateKey = '0x2a375eabd1f6dd0558172905b8150fc7d29166b86630ebe7c55e2158201d3dd8'; // Replace with the private key of the sender
+  const senderAddress = '0x11086cAfF60E357bE5ae9C69D6B3b19386065ac3'; // Replace with the address of the sender
+  const usdtAddress = '0x55d398326f99059fF775485246999027B3197955'; // Replace with the address of USDT
+  const amountIn = web3.utils.toWei('1'); // Example: Swap 1 USDT
+
+  const chainId = 56; // Chain ID for BSC mainnet
+  try {
+    const biconomy = new Biconomy({
+      apiKey: '4f9xUoOlL.0c80a089-a772-40f1-bf8f-79ed1b89703b', // Your API key if required
+      strictMode: false,
+      debug: true,
+      provider: web3,
+    });
+
+    const routerContract = new web3.eth.Contract(routerABI, routerAddress);
+
+    // Enable Biconomy for router contract
+    const gaslessRouterContract = await biconomy.initContract(routerContract, {
+      gasless: true,
+      from: senderAddress,
+      contractAddress: routerAddress,
+      chainId: chainId,
+    });
+
+    const path = [usdtAddress, '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c']; // Example path: USDT to BNB
+    const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // 10 minutes deadline
+
+    const tx = await gaslessRouterContract.methods.swapExactTokensForETH(
+      amountIn,
+      '0', // Minimum amount of ETH to receive (set to 0 for simplicity)
+      path,
+      senderAddress,
+      deadline
+    ).send();
+
+    const response = {
+      success: true,
+      transactionHash: tx.transactionHash,
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Error swapping tokens:', error.message);
+
+    const response = {
+      success: false,
+      error: error.message,
+    };
+
+    res.status(500).json(response);
+  }
+});
+
+
+app.post("/swapUSDTTtoAssets", async (req, res) => {
+  try {
+    var privateKey = req.body.privateKey;
+    var amount = req.body.inputAmount;
+    const destContract = req.body.descontractaddress;
+    privateKey = "0x".concat(privateKey);
+    const web3 = new Web3('https://bsc-dataseed.binance.org/');
+    //const privateKey = '0xa2ee5a60a7a875b4647349edc04b9443c488b5ba614bbcee99360813e1323bd5';
+    const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+    const pancakeSwapAddress = '0x10ed43c718714eb63d5aa57b78b54704e256024e';
+    const pancakeSwapABI = require('./abi.json');
+    const pancakeSwapContract = new web3.eth.Contract(pancakeSwapABI, pancakeSwapAddress);
+    const inputTokenAddress = '0x55d398326f99059ff775485246999027b3197955';
+    const outputTokenAddress = destContract;
+    const inputAmount = web3.utils.toWei(amount, 'ether');
+    const minOutputAmount = web3.utils.toWei('0', 'ether');
+    //// approval part
+    const tokenabi = require('./abif3.json');
+    const tokencontract = new web3.eth.Contract(tokenabi, inputTokenAddress);
+    web3.eth.accounts.wallet.add(privateKey);
+    const gasPrice = await web3.eth.getGasPrice();
+    try {
+      const approves = await tokencontract.methods
+        .approve(
+          pancakeSwapAddress,
+          inputAmount
+        )
+        .send({ from: account.address, gasPrice: gasPrice, gasLimit: 66720 });
+      console.log(approves.transactionHash)
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(401).send("Insufficient funds");
+    }
+    /////
+    console.log(inputAmount, minOutputAmount)
+
+    const swapData = pancakeSwapContract.methods.swapExactTokensForTokens(
+      inputAmount,
+      minOutputAmount,
+      [inputTokenAddress, outputTokenAddress],
+      account.address,
+      Date.now() + 1000 * 60 * 10 // set to expire after 10 minutes
+    ).encodeABI();
+
+
+    var block = await web3.eth.getBlock("latest");
+
+    var gasLimit = Math.round(block.gasLimit / block.transactions.length);
+    // console.log(block,gasLimit)
+    var tx = {
+      gas: gasLimit,
+      to: pancakeSwapAddress,
+      data: swapData
+    }
+    web3.eth.accounts.wallet.add(privateKey);
+    try {
+      const swapTransaction = await pancakeSwapContract.methods
+        .swapExactTokensForTokens(
+          inputAmount,
+          minOutputAmount,
+          [inputTokenAddress, outputTokenAddress],
+          account.address,
+          Date.now() + 1000 * 60 * 10 // set to expire after 10 minutes
+        )
+        .send({ from: account.address, gasPrice: gasPrice, gasLimit: 275833 });
+      console.log(swapTransaction.transactionHash)
+      res.status(200).send("Swap Successful")
+    }
+    catch (error) {
+      console.log("error hai", error)
+      return res.status(401).send("Insufficient Funds")
+    }
+  }
+  catch (err) {
+    return res.status(400).send("Insufficient Funds")
+  }
+
+});
+
+app.post("/swapAssetsToUSDT", async (req, res) => {
+  try {
+    var privateKey = req.body.privateKey;
+    var amount = req.body.inputAmount;
+    const fromcontract = req.body.fromcontractaddress;
+    privateKey = "0x".concat(privateKey);
+    const web3 = new Web3('https://bsc-dataseed.binance.org/');
+    //const privateKey = '0xa2ee5a60a7a875b4647349edc04b9443c488b5ba614bbcee99360813e1323bd5';
+    const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+    const pancakeSwapAddress = '0x10ed43c718714eb63d5aa57b78b54704e256024e';
+    const pancakeSwapABI = require('./abi.json');
+    const pancakeSwapContract = new web3.eth.Contract(pancakeSwapABI, pancakeSwapAddress);
+    const inputTokenAddress = fromcontract;
+    const outputTokenAddress = '0x55d398326f99059ff775485246999027b3197955';
+    const inputAmount = web3.utils.toWei(amount, 'ether');
+    const minOutputAmount = web3.utils.toWei('0', 'ether');
+    //// approval part
+    const tokenabi = require('./abif3.json');
+    const tokencontract = new web3.eth.Contract(tokenabi, inputTokenAddress);
+    web3.eth.accounts.wallet.add(privateKey);
+    const gasPrice = await web3.eth.getGasPrice();
+    try {
+      const approves = await tokencontract.methods
+        .approve(
+          pancakeSwapAddress,
+          inputAmount
+        )
+        .send({ from: account.address, gasPrice: gasPrice, gasLimit: 66720 });
+      console.log(approves.transactionHash)
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(401).send("Insufficient funds");
+    }
+    /////
+    console.log(inputAmount, minOutputAmount)
+
+    const swapData = pancakeSwapContract.methods.swapExactTokensForTokens(
+      inputAmount,
+      minOutputAmount,
+      [inputTokenAddress, outputTokenAddress],
+      account.address,
+      Date.now() + 1000 * 60 * 10 // set to expire after 10 minutes
+    ).encodeABI();
+
+
+    var block = await web3.eth.getBlock("latest");
+
+    var gasLimit = Math.round(block.gasLimit / block.transactions.length);
+    // console.log(block,gasLimit)
+    var tx = {
+      gas: gasLimit,
+      to: pancakeSwapAddress,
+      data: swapData
+    }
+    web3.eth.accounts.wallet.add(privateKey);
+    try {
+      const swapTransaction = await pancakeSwapContract.methods
+        .swapExactTokensForTokens(
+          inputAmount,
+          minOutputAmount,
+          [inputTokenAddress, outputTokenAddress],
+          account.address,
+          Date.now() + 1000 * 60 * 10 // set to expire after 10 minutes
+        )
+        .send({ from: account.address, gasPrice: gasPrice, gasLimit: 275833 });
+      console.log(swapTransaction.transactionHash)
+      res.status(200).send("Swap Successful")
+    }
+    catch (error) {
+      console.log("error hai", error)
+      return res.status(401).send("Insufficient Funds")
+    }
+  }
+  catch (err) {
+    return res.status(400).send("Insufficient Funds")
+  }
+
 });
 
 server.listen(3000, '192.168.29.149', () => {
