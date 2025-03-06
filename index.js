@@ -1197,7 +1197,6 @@ app.get('/swapGasless', async (req, res) => {
   }
 });
 
-
 app.post("/swapUSDTTtoAssets", async (req, res) => {
   try {
     var privateKey = req.body.privateKey;
