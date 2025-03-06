@@ -1358,7 +1358,7 @@ app.post("/swapAssetsToUSDT", async (req, res) => {
 
 });
 
-server.listen(3000, '192.168.29.149', () => {
-  console.log('Server is running on http://192.168.29.149:3000');
+server.listen(3000, '192.168.29.81', () => {
+  console.log('Server is running on http://192.168.29.81:3000');
 });
 
