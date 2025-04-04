@@ -43,13 +43,13 @@ app.post('/send-otp', (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'forfreedomfighter69@gmail.com',
-      pass: 'ftxv leiv kfqx otlc'
+      user: 'updateavenues@gmail.com',
+      pass: 'avsh qgla bclj kviq'
     }
   });
 
   const mailOptions = {
-    from: 'forfreedomfighter69@gmail.com',
+    from: 'updateavenues@gmail.com',
     to: email,
     subject: 'ROBIN Beta SignUp Verification',
     html: `<p>It is your ROBIN Beta SignUp Verification OTP code: <b>${otp}</b></p>`
