@@ -1357,6 +1357,34 @@ app.post("/swapAssetsToUSDT", async (req, res) => {
 
 });
 
+//NewStart
+app.get("/getAvailableGiftCardsCountry", async (req, res) => {
+    const { countryCode } = req.query;
+    const RELOADLY_API_TOKEN = '';
+    if (!RELOADLY_API_TOKEN) {
+        return res.status(500).json({ error: "Missing API token" });
+    }
+
+    try {
+        const response = await axios.get(
+            `https://giftcards-sandbox.reloadly.com/countries/${countryCode}/products`,
+            {
+                headers: {
+                    Authorization: `Bearer ${RELOADLY_API_TOKEN}`,
+                },
+            }
+        );
+
+        res.json({giftcards : response.data});
+    } catch (error) {
+        console.error("Error fetching gift cards:", error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: "Failed to fetch gift cards",
+            details: error.response?.data || error.message,
+        });
+    }
+});
+
 server.listen(3000, '192.168.29.81', () => {
   console.log('Server is running on http://192.168.29.81:3000');
 });
