@@ -136,7 +136,7 @@ app.post("/import-wallet", async (req, res) => {
   }
 });
 
-app.post("/generate-wallet", async (req, res) => {
+app.get("/generate-wallet", async (req, res) => {
   const wallet = await ethers.Wallet.createRandom();
   console.log("Wallet Address:", wallet.address);
   console.log("Private key:", wallet.privateKey);
