@@ -1399,42 +1399,42 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
   const CLIENT_SECRET = 'lt7iqlInAw-aZbeMImpfYVCtdLFicl-Q0VCwKupMEiLqKKbnISxXEbA0qtlILyw';
 
   if (!countryCode) {
-      return res.status(400).json({ error: "Missing 'countryCode' in query params" });
+    return res.status(400).json({ error: "Missing 'countryCode' in query params" });
   }
 
   try {
-      // Step 1: Get access token from Reloadly
-      const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-          grant_type: 'client_credentials',
-          audience: 'https://giftcards-sandbox.reloadly.com'
-      }, {
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      });
+    // Step 1: Get access token from Reloadly Production
+    const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      audience: 'https://giftcards.reloadly.com' // ✅ Production audience
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
-      const accessToken = tokenResponse.data.access_token;
+    const accessToken = tokenResponse.data.access_token;
 
-      // Step 2: Use token to fetch gift cards by country
-      const giftCardResponse = await axios.get(
-          `https://giftcards-sandbox.reloadly.com/countries/${countryCode}/products`,
-          {
-              headers: {
-                  Authorization: `Bearer ${accessToken}`
-              }
-          }
-      );
+    // Step 2: Use token to fetch gift cards (Production endpoint)
+    const giftCardResponse = await axios.get(
+      `https://giftcards.reloadly.com/countries/${countryCode}/products`, // ✅ Production endpoint
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
 
-      res.json({ giftcards: giftCardResponse.data });
+    res.json({ giftcards: giftCardResponse.data });
 
   } catch (error) {
-      console.error("Error fetching gift cards:", error.response?.data || error.message);
-      res.status(error.response?.status || 500).json({
-          error: "Failed to fetch gift cards",
-          details: error.response?.data || error.message,
-      });
+    console.error("Error fetching gift cards:", error.response?.data || error.message);
+    res.status(error.response?.status || 500).json({
+      error: "Failed to fetch gift cards",
+      details: error.response?.data || error.message,
+    });
   }
 });
 
