@@ -32,6 +32,38 @@ app.use(
   })
 );
 
+//Otp-Verifications
+app.post('/send-otp', (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP are required' });
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'forfreedomfighter69@gmail.com',
+      pass: 'ftxv leiv kfqx otlc'
+    }
+  });
+
+  const mailOptions = {
+    from: 'forfreedomfighter69@gmail.com',
+    to: email,
+    subject: 'ROBIN Beta SignUp Verification',
+    html: `<p>It is your ROBIN Beta SignUp Verification OTP code: <b>${otp}</b></p>`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending OTP:', error);
+      return res.status(500).json({ message: 'Failed to send OTP' });
+    }
+    res.status(200).json({ message: 'OTP sent successfully' });
+  });
+});
+
 const calculateTotalNairaValue = (data) => {
   return data.reduce((total, item) => total + item.nairaValue, 0);
 };
