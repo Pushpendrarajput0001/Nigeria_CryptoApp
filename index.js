@@ -434,6 +434,9 @@ app.get('/fetchWatchlistData', async (req, res) => {
   });
   const ngnRate = parseFloat(ngnResponse.data.price);
 
+  console.log(`NGN RATE : ${ngnRate}`);
+  console.log(`ngnRateResponse : ${ngnResponse.data.price}`);
+
   const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
     'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
     'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
@@ -1391,33 +1394,51 @@ app.post("/swapAssetsToUSDT", async (req, res) => {
 
 //NewStart
 app.get("/getAvailableGiftCardsCountry", async (req, res) => {
-    const { countryCode } = req.query;
-    const RELOADLY_API_TOKEN = '';
-    if (!RELOADLY_API_TOKEN) {
-        return res.status(500).json({ error: "Missing API token" });
-    }
+  const { countryCode } = req.query;
+  const CLIENT_ID = 'YXFm6rDVxbvqKTOXCgdI5OYf4mMkEnNd';
+  const CLIENT_SECRET = 'lt7iqlInAw-aZbeMImpfYVCtdLFicl-Q0VCwKupMEiLqKKbnISxXEbA0qtlILyw';
 
-    try {
-        const response = await axios.get(
-            `https://giftcards-sandbox.reloadly.com/countries/${countryCode}/products`,
-            {
-                headers: {
-                    Authorization: `Bearer ${RELOADLY_API_TOKEN}`,
-                },
-            }
-        );
+  if (!countryCode) {
+      return res.status(400).json({ error: "Missing 'countryCode' in query params" });
+  }
 
-        res.json({giftcards : response.data});
-    } catch (error) {
-        console.error("Error fetching gift cards:", error.response?.data || error.message);
-        res.status(error.response?.status || 500).json({
-            error: "Failed to fetch gift cards",
-            details: error.response?.data || error.message,
-        });
-    }
+  try {
+      // Step 1: Get access token from Reloadly
+      const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+          grant_type: 'client_credentials',
+          audience: 'https://giftcards-sandbox.reloadly.com'
+      }, {
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      });
+
+      const accessToken = tokenResponse.data.access_token;
+
+      // Step 2: Use token to fetch gift cards by country
+      const giftCardResponse = await axios.get(
+          `https://giftcards-sandbox.reloadly.com/countries/${countryCode}/products`,
+          {
+              headers: {
+                  Authorization: `Bearer ${accessToken}`
+              }
+          }
+      );
+
+      res.json({ giftcards: giftCardResponse.data });
+
+  } catch (error) {
+      console.error("Error fetching gift cards:", error.response?.data || error.message);
+      res.status(error.response?.status || 500).json({
+          error: "Failed to fetch gift cards",
+          details: error.response?.data || error.message,
+      });
+  }
 });
 
-server.listen(3000, '192.168.29.81', () => {
-  console.log('Server is running on http://192.168.29.81:3000');
+server.listen(3000, '192.168.29.65', () => {
+  console.log('Server is running on http://192.168.29.65:3000');
 });
 
