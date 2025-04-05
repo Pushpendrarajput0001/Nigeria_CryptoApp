@@ -1231,7 +1231,7 @@ app.get('/swapGasless', async (req, res) => {
 
     res.status(500).json(response);
   }
-});   
+});
 
 app.post("/swapUSDTTtoAssets", async (req, res) => {
   try {
@@ -1437,6 +1437,85 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
     res.status(error.response?.status || 500).json({
       error: "Failed to fetch gift cards",
       details: error.response?.data || error.message,
+    });
+  }
+});
+
+//order
+app.post('/orderGiftCard', async (req, res) => {
+  const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
+  const CLIENT_SECRET = 'wCi9q19bnk-kgAeM5BJlSFUWvhIJv3-6D5ES73AJeF6pfJObLI2IinBNGCzcEpo';
+  try {
+    const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      audience: 'https://giftcards.reloadly.com'
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const orderData = req.body;
+
+    const response = await axios.post(
+      'https://giftcards.reloadly.com/orders',
+      orderData,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    res.status(200).json({
+      message: 'Gift card ordered successfully!',
+      data: response.data
+    });
+
+  } catch (error) {
+    console.error('Error placing order:', error.response?.data || error.message);
+    res.status(500).json({
+      message: 'Failed to order gift card',
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+app.get('/redeemInstructions', async (req, res) => {
+  const { brandId } = req.query;
+  const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
+  const CLIENT_SECRET = 'wCi9q19bnk-kgAeM5BJlSFUWvhIJv3-6D5ES73AJeF6pfJObLI2IinBNGCzcEpo';
+  try {
+    const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      audience: 'https://giftcards.reloadly.com'
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+
+    const response = await axios.get(`https://giftcards.reloadly.com/redeem-instructions/${brandId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    res.status(200).json({
+      message: 'Redeem instructions fetched successfully!',
+      data: response.data
+    });
+
+  } catch (error) {
+    console.error('Error fetching redeem instructions:', error.response?.data || error.message);
+    res.status(500).json({
+      message: 'Failed to fetch redeem instructions',
+      error: error.response?.data || error.message
     });
   }
 });
