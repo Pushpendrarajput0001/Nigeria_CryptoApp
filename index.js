@@ -13,6 +13,7 @@ const cw = require("crypto-wallets")
 const axios = require('axios');
 const { ethers, JsonRpcProvider, formatEther, parseUnits, isAddress, ContractTransactionResponse, InfuraProvider } = require("ethers");
 const cheerio = require('cheerio');
+const nodemailer = require('nodemailer');
 //const { JsonRpcProviderr } = require("@ethersproject/providers");
 const { EthHdWallet, generateMnemonic } = require("eth-hd-wallet");
 const web3 = new Web3('https://bsc-dataseed.binance.org/');
