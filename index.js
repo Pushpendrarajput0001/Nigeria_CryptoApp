@@ -33,8 +33,8 @@ app.use(
 );
 
 //Otp-Verifications
-app.post('/send-otp', (req, res) => {
-  const { email, otp } = req.body;
+app.get('/send-otp', (req, res) => {
+  const { email, otp } = req.query;
 
   if (!email || !otp) {
     return res.status(400).json({ message: 'Email and OTP are required' });
