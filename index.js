@@ -49,7 +49,7 @@ app.post('/send-otp', (req, res) => {
   });
 
   const mailOptions = {
-    from: 'updateavenues@gmail.com',
+    from: 'robinbitapp@gmail.com',
     to: email,
     subject: 'ROBIN Beta SignUp Verification',
     html: `<p>It is your ROBIN Beta SignUp Verification OTP code: <b>${otp}</b></p>`
