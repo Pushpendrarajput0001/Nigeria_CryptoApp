@@ -1394,6 +1394,8 @@ app.post("/swapAssetsToUSDT", async (req, res) => {
 });
 
 //NewStart
+
+//GiftCard
 app.get("/getAvailableGiftCardsCountry", async (req, res) => {
   const { countryCode } = req.query;
   const CLIENT_ID = 'YXFm6rDVxbvqKTOXCgdI5OYf4mMkEnNd';
@@ -1428,7 +1430,7 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
       }
     );
 
-    res.json({ giftcards: giftCardResponse.data });
+    res.status(200).json({ giftcards: giftCardResponse.data });
 
   } catch (error) {
     console.error("Error fetching gift cards:", error.response?.data || error.message);
