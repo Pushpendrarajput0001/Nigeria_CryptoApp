@@ -1508,7 +1508,7 @@ app.get('/redeemInstructions', async (req, res) => {
 
     res.status(200).json({
       message: 'Redeem instructions fetched successfully!',
-      data: response.data
+      instruction: response.data
     });
 
   } catch (error) {
