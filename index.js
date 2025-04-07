@@ -1554,7 +1554,7 @@ app.post('/orderGiftCard', async (req, res) => {
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
       grant_type: 'client_credentials',
-      audience: 'https://giftcards.reloadly.com'
+      audience: 'https://giftcards-sandbox.reloadly.com'
     }, {
       headers: {
         'Content-Type': 'application/json'
@@ -1566,7 +1566,7 @@ app.post('/orderGiftCard', async (req, res) => {
     const orderData = req.body;
 
     const response = await axios.post(
-      'https://giftcards.reloadly.com/orders',
+      'https://giftcards-sandbox.reloadly.com',
       orderData,
       {
         headers: {
