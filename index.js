@@ -1442,6 +1442,8 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
 });
 
 //order
+
+
 app.post('/orderGiftCard', async (req, res) => {
   const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
   const CLIENT_SECRET = 'wCi9q19bnk-kgAeM5BJlSFUWvhIJv3-6D5ES73AJeF6pfJObLI2IinBNGCzcEpo';
