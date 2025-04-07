@@ -1547,14 +1547,14 @@ app.get('/getBalanceForGiftCard',async(req,res)=>{
 })
 
 app.post('/orderGiftCard', async (req, res) => {
-  const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
-  const CLIENT_SECRET = 'wCi9q19bnk-kgAeM5BJlSFUWvhIJv3-6D5ES73AJeF6pfJObLI2IinBNGCzcEpo';
+  const CLIENT_ID = 'YXFm6rDVxbvqKTOXCgdI5OYf4mMkEnNd';
+  const CLIENT_SECRET = 'lt7iqlInAw-aZbeMImpfYVCtdLFicl-Q0VCwKupMEiLqKKbnISxXEbA0qtlILyw';
   try {
     const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
       grant_type: 'client_credentials',
-      audience: 'https://giftcards-sandbox.reloadly.com'
+      audience: 'https://giftcards.reloadly.com'
     }, {
       headers: {
         'Content-Type': 'application/json'
@@ -1566,7 +1566,7 @@ app.post('/orderGiftCard', async (req, res) => {
     const orderData = req.body;
 
     const response = await axios.post(
-      'https://giftcards-sandbox.reloadly.com/orders',
+      'https://giftcards.reloadly.com/orders',
       orderData,
       {
         headers: {
