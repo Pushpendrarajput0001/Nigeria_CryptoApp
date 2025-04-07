@@ -1442,8 +1442,68 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
 });
 
 //proceedToPayment
-app.get('/proceedToPaymentPayStack',async(req,res)=>{
-  
+app.get('/proceedToPaymentPayStack', async (req, res) => {
+  const { email, amount } = req.query;
+
+  if (!email || !amount) {
+    return res.status(400).json({ error: 'Email and amount are required' });
+  }
+
+  const PAYSTACK_SECRET_KEY = 'sk_test_a05fec383a7b27ac809ea758d8a07c6cacd8ef04';
+
+  try {
+    const response = await axios.post(
+      'https://api.paystack.co/transaction/initialize',
+      {
+        email: email,
+        amount: parseInt(amount) * 100, 
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const { access_code, reference, authorization_url } = response.data.data;
+    res.status(200).json({ access_code, reference, authorization_url });
+  } catch (error) {
+    console.error('Init Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to initialize transaction' });
+  }
+});
+
+app.get('/verifyPaystackPayment', async (req, res) => {
+  const { reference } = req.query;
+
+  if (!reference) {
+    return res.status(400).json({ error: 'Transaction reference is required' });
+  }
+
+  const PAYSTACK_SECRET_KEY = 'sk_test_a05fec383a7b27ac809ea758d8a07c6cacd8ef04';
+
+  try {
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    const result = response.data.data;
+
+    if (result.status === 'success') {
+      res.status(200).json({ verified: true, data: result });
+    } else {
+      res.status(401).json({ verified: false, data: result });
+    }
+  } catch (error) {
+    console.error('Verify Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to verify transaction' });
+  }
 });
 
 //order
