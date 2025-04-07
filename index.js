@@ -1441,6 +1441,11 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
   }
 });
 
+//proceedToPayment
+app.get('/proceedToPaymentPayStack',async(req,res)=>{
+  
+});
+
 //order
 app.get('/getBalanceForGiftCard',async(req,res)=>{
   // const CLIENT_ID = 'YXFm6rDVxbvqKTOXCgdI5OYf4mMkEnNd';
