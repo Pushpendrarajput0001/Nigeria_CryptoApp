@@ -1442,7 +1442,44 @@ app.get("/getAvailableGiftCardsCountry", async (req, res) => {
 });
 
 //order
+app.get('/getBalanceForGiftCard',async(req,res)=>{
+  // const CLIENT_ID = 'YXFm6rDVxbvqKTOXCgdI5OYf4mMkEnNd';
+  // const CLIENT_SECRET = 'lt7iqlInAw-aZbeMImpfYVCtdLFicl-Q0VCwKupMEiLqKKbnISxXEbA0qtlILyw';
+  const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
+  const CLIENT_SECRET = 'wCi9q19bnk-kgAeM5BJlSFUWvhIJv3-6D5ES73AJeF6pfJObLI2IinBNGCzcEpo';
+  try {
+    const tokenResponse = await axios.post('https://auth.reloadly.com/oauth/token', {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: 'client_credentials',
+      audience: 'https://giftcards-sandbox.reloadly.com'
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
+    const accessToken = tokenResponse.data.access_token;
+
+    const balanceResponse = await axios.get(
+      `https://giftcards-sandbox.reloadly.com/accounts/balance`, 
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
+    );
+
+    res.status(200).json(balanceResponse.data);
+
+  } catch (error) {
+    console.error("Error fetching balance:", error.response?.data || error.message);
+    res.status(error.response?.status || 500).json({
+      error: "Failed to fetch balance",
+      details: error.response?.data || error.message,
+    });
+  }
+})
 
 app.post('/orderGiftCard', async (req, res) => {
   const CLIENT_ID = 's68i3GhI0NkXLa4igSgDcUI9pCvHoH9J';
