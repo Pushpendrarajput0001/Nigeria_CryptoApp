@@ -1566,7 +1566,7 @@ app.post('/orderGiftCard', async (req, res) => {
     const orderData = req.body;
 
     const response = await axios.post(
-      'https://giftcards-sandbox.reloadly.com',
+      'https://giftcards-sandbox.reloadly.com/orders',
       orderData,
       {
         headers: {
