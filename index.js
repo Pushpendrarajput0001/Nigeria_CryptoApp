@@ -1599,14 +1599,14 @@ app.get('/redeemInstructions', async (req, res) => {
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
       grant_type: 'client_credentials',
-      audience: 'https://giftcards.reloadly.com'
+      audience: 'https://giftcards-sandbox.reloadly.com'
     }, {
       headers: { 'Content-Type': 'application/json' }
     });
 
     const accessToken = tokenResponse.data.access_token;
 
-    const response = await axios.get(`https://giftcards.reloadly.com/redeem-instructions/${brandId}`, {
+    const response = await axios.get(`https://giftcards-sandbox.reloadly.com/redeem-instructions/${brandId}`, {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
