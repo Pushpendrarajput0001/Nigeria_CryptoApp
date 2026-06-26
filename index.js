@@ -1633,7 +1633,7 @@ app.get('/redeemInstructions', async (req, res) => {
 //Airtime
 
 
-server.listen(3000, '192.168.29.112', () => {
+server.listen(3000, '0.0.0.0', () => {
   console.log('Server is running on http://192.168.29.112:3000');
 });
 
