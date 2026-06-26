@@ -200,26 +200,6 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
       "0x2859e4544C4bB03966803b044A93563Bd2D0DD4D",
       "0x4b0f1812e5df2a09796481ff14017e6005508003",
       "0xaef0d72a118ce24fee3cd1d43d383897d05b4e99",
-
-
-      //ethers
-      // "0x4d224452801aced8b2f0aebe155379bb5d594381",
-      // "0x81f8f0bb1cb2a06649e51913a151f0e7ef6fa321",
-      // "0xbb0e17ef65f82ab018d8edd776e8dd940327b28b",
-      // "0xC669928185DbCE49d2230CC9B0979BE6DC797957",
-      // "0x4fabb145d64652a948d72533023f6e7a623c7c53",
-      // "0x3506424f91fd33084466f402d5d97f05f8e3b4af",
-      // "0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c",
-      // "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
-      // "0xd1d2Eb1B1e90B638588728b4130137D262C87cae",
-      // "0x514910771af9ca656af840dff83e8264ecf986ca",
-      // "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
-      // "0x3845badade8e6dff049820680d1f14bd3903a5d0",
-      // "0xCC8Fa225D80b9c7D42F96e9570156c65D6cAAa25",
-      // "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-      // "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      // "0x163f8c2467924be0ae7b5347228cabf260318753",
-      // ""
     ];
 
     const nairaValues = {
@@ -235,7 +215,6 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
       "0x2859e4544C4bB03966803b044A93563Bd2D0DD4D": 0.008,
       "0x4b0f1812e5df2a09796481ff14017e6005508003": 970,
       "0xaef0d72a118ce24fee3cd1d43d383897d05b4e99": 0.073,
-
     };
 
     const imageUrlMapping = {
@@ -251,42 +230,47 @@ app.post("/fetchbalancesbscscan", async (req, res) => {
       "0x2859e4544C4bB03966803b044A93563Bd2D0DD4D": "https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png",
       "0x4b0f1812e5df2a09796481ff14017e6005508003": "https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png",
       "0xaef0d72a118ce24fee3cd1d43d383897d05b4e99": "https://s2.coinmarketcap.com/static/img/coins/64x64/4206.png",
-
     };
 
     const balances = [];
 
     for (const contractAddress of contractAddresses) {
-      const contract = new ethers.Contract(contractAddress, abi, provider);
-      const name = await contract.name();
-      const symbol = await contract.symbol();
-      const decimals = await contract.decimals();
+      try {
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const name = await contract.name();
+        const symbol = await contract.symbol();
+        const decimals = await contract.decimals();
 
-      const token = {
-        name: name,
-        symbol: symbol,
-        decimals: decimals
-      };
+        const balance = await contract.balanceOf(wallet.address);
+        const tokenBalance = parseFloat(formatEther(balance));
+        
+        // Check if token has balance before adding to results
+        if (tokenBalance > 0) {
+          const nairaValue = tokenBalance * (nairaValues[contractAddress] || 0);
+          // Use optional chaining and fallback for image URL
+          const imageUrl = imageUrlMapping[contractAddress] || "https://via.placeholder.com/64x64?text=No+Image";
 
-      const balance = await contract.balanceOf(wallet.address);
-      const tokenBalance = formatEther(balance);
-      const nairaValue = tokenBalance * nairaValues[contractAddress];
-      const imageUrl = imageUrlMapping[contractAddress] || "";
-
-      balances.push({
-        tokenName: token.name,
-        tokenSymbol: token.symbol,
-        tokenBalance: formatEther(balance),
-        nairaValue: nairaValue,
-        coinImageUrl: imageUrl, // Include the image URL for the contract
-      });
+          balances.push({
+            tokenName: name || "Unknown Token",
+            tokenSymbol: symbol || "Unknown",
+            tokenBalance: tokenBalance,
+            nairaValue: nairaValue,
+            coinImageUrl: imageUrl,
+            contractAddress: contractAddress, // Added for debugging
+          });
+        }
+      } catch (contractError) {
+        console.error(`Error fetching data for contract ${contractAddress}:`, contractError.message);
+        // Skip this contract and continue with others
+        continue;
+      }
     }
 
-    const totalNairaValue = calculateTotalNairaValue(balances);
+    const totalNairaValue = balances.reduce((sum, item) => sum + item.nairaValue, 0);
     res.status(200).json({ balances, totalNairaValue });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message || error });
   }
 });
 
