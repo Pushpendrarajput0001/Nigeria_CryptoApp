@@ -11,6 +11,7 @@ const server = http.createServer(app);
 const bitcoin = require('bitcoinjs-lib');
 const cw = require("crypto-wallets")
 const axios = require('axios');
+const NodeCache = require('node-cache');
 const { ethers, JsonRpcProvider, formatEther, parseUnits, isAddress, ContractTransactionResponse, InfuraProvider } = require("ethers");
 const cheerio = require('cheerio');
 const nodemailer = require('nodemailer');
@@ -428,165 +429,170 @@ app.post("/fetchBinanceBalance", async (req, res) => {
   }
 });
 
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+
+const COINS_LIST = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
+  'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
+  'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
+  'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
+  'uniswap', 'usdc'];
+
+const IMAGE_URL_MAPPING = {
+  'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
+  ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+  cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
+  tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+  'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
+  bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
+  'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
+  coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
+  pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
+  polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
+  'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
+  'Trust-Wallet-Token': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
+  apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
+  'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
+  'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
+  busd: 'https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353',
+  chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
+  decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
+  'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
+  'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
+  uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
+  usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+};
+
+const COIN_NAME_MAPPING = {
+  'bitcoin-BEP2': { name: 'Bitcoin', symbol: 'BTC' }
+};
+
 app.get('/fetchWatchlistData', async (req, res) => {
-
-  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-    params: { symbol: 'USDTNGN' }
-  });
-  const ngnRate = parseFloat(ngnResponse.data.price);
-
-  console.log(`NGN RATE : ${ngnRate}`);
-  console.log(`ngnRateResponse : ${ngnResponse.data.price}`);
-
-  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
-    'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
-    'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
-    'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
-    'uniswap', 'usdc',]; // List of coins to fetch
-
-  const imageUrlMapping = {
-    'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-    ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-    cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
-    tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-    'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
-    bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
-    'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
-    coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
-    pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
-    polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
-    'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
-    'Trust-Wallet-Token': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
-    apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
-    'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
-    'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
-    busd: 'https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353',
-    chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
-    decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
-    'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
-    'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
-    uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
-    usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-  };
-
   try {
-    const coinData = [];
+    const cachedData = cache.get('watchlistData');
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
 
+    const [ngnResponse, coinMarketData] = await Promise.all([
+      fetchNGNRate(),
+      fetchCoinMarketCapData()
+    ]);
 
-
-    const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
-    const data = await response.json();
-
-    const coins = data.data.cryptoCurrencyList;
-
-
-    const nameCoins = coins.name
-
-    coinsList.forEach((coinName) => {
-      const formattedCoinName = coinName.toLowerCase().replace(/\s+/g, '-'); // Format coin name
-      const coinSlug = coins.find((c) => c.slug.toLowerCase() === formattedCoinName || c.name.toLowerCase() === formattedCoinName); // Find coin by slug or name
-
-      if (coinSlug) {
-        const { name, symbol, quotes } = coinSlug;
-        const { price, percentChange24h } = quotes.find((quote) => quote.name === 'USD') || { price: 0, percentChange24h: 0 };
-        const imageUrl = imageUrlMapping[formattedCoinName] || '';
-        const finalImageUrl = coinName === 'bitcoin-BEP2' ? imageUrlMapping['bitcoin-BEP2'] : imageUrl; // Updated image URL for bitcoin-BEP2
-
-        coinData.push({
-          name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
-          symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
-          current_price: Number(price) * Number(ngnRate),
-          image: finalImageUrl,
-          percentage_change_24h: percentChange24h,
-        });
-      }
-    });
-
-
-    res.status(200).json({ coinData });
+    const ngnRate = parseFloat(ngnResponse.data.price);
+    const coinData = processCoinData(coinMarketData, ngnRate, false);
+    const response = { coinData };
+    
+    cache.set('watchlistData', response);
+    
+    res.status(200).json(response);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error fetching data from CoinMarketCap' });
+    const staleCache = cache.get('watchlistData');
+    if (staleCache) {
+      return res.status(200).json(staleCache);
+    }
+    
+    res.status(500).json({ error: 'Error fetching watchlist data' });
   }
 });
 
 app.get('/fetchtopgainersdata', async (req, res) => {
-
-  const ngnResponse = await axios.get('https://api.binance.com/api/v3/ticker/price', {
-    params: { symbol: 'USDTNGN' }
-  });
-  const ngnRate = parseFloat(ngnResponse.data.price);
-
-  const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500');
-  const data = await response.json();
-  const coins = data.data.cryptoCurrencyList;
-
-  const coinsList = ['bitcoin-BEP2', 'ethereum', 'cardano', 'tether', 'My-Neighbor-Alice',
-    'bnb', 'cosmos-hub', 'coin98', 'pancakeswap', 'polygon', 'shiba-inu',
-    'Trust-Wallet-Token', 'apecoin', 'axie-infinity', 'bittorrent-new', 'busd',
-    'chainlink', 'decentraland', 'the-sandbox', 'smooth-love-potion',
-    'uniswap', 'usdc',]; // List of coins to fetch
-
-  const imageUrlMapping = {
-    'bitcoin-BEP2': 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png',
-    ethereum: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-    cardano: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png',
-    tether: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-    'My-Neighbor-Alice': 'https://s2.coinmarketcap.com/static/img/coins/64x64/8766.png',
-    bnb: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7192.png',
-    'cosmos-hub': 'https://s2.coinmarketcap.com/static/img/coins/64x64/3794.png',
-    coin98: 'https://s2.coinmarketcap.com/static/img/coins/64x64/10903.png',
-    pancakeswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
-    polygon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3890.png',
-    'shiba-inu': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5994.png',
-    'Trust-Wallet-Token': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5964.png',
-    apecoin: 'https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png',
-    'axie-infinity': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6783.png',
-    'bittorrent-new': 'https://s2.coinmarketcap.com/static/img/coins/64x64/16086.png',
-    busd: 'https://assets.coingecko.com/coins/images/23061/standard/logo_-_2022-01-26T091043.556.png?1696522353',
-    chainlink: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png',
-    decentraland: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1966.png',
-    'the-sandbox': 'https://s2.coinmarketcap.com/static/img/coins/64x64/6210.png',
-    'smooth-love-potion': 'https://s2.coinmarketcap.com/static/img/coins/64x64/5824.png',
-    uniswap: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png',
-    usdc: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-  };
-
-
   try {
-    const filteredCoins = [];
+    const cachedData = cache.get('topGainersData');
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
 
-    coinsList.forEach((coinName) => {
-      const formattedCoinName = coinName.toLowerCase().replace(/\s+/g, '-');
-      const coinSlug = coins.find((c) => c.slug.toLowerCase() === formattedCoinName || c.name.toLowerCase() === formattedCoinName);
+    const [ngnResponse, coinMarketData] = await Promise.all([
+      fetchNGNRate(),
+      fetchCoinMarketCapData()
+    ]);
 
-      if (coinSlug) {
-        const { name, symbol, quotes } = coinSlug;
-        const { price, percentChange24h } = quotes.find((quote) => quote.name === 'USD') || { price: 0, percentChange24h: 0 };
-        const imageUrl = imageUrlMapping[formattedCoinName] || '';
-
-        if (percentChange24h > 0) { // Filter coins with positive percentage change
-          const finalImageUrl = coinName === 'bitcoin-BEP2' ? imageUrlMapping['bitcoin-BEP2'] : imageUrl; // Updated image URL for bitcoin-BEP2
-          filteredCoins.push({
-            name: coinName === 'bitcoin-BEP2' ? 'Bitcoin' : name, // Updated name for bitcoin-BEP2
-            symbol: coinName === 'bitcoin-BEP2' ? 'BTC' : symbol, // Updated symbol for bitcoin-BEP2
-            current_price: Number(price) * Number(ngnRate),
-            image: finalImageUrl,
-            percentage_change_24h: percentChange24h,
-          });
-        }
-      }
-    });
-
-    // Sort filteredCoins based on percentage_change_24h in descending order
-    filteredCoins.sort((a, b) => b.percentage_change_24h - a.percentage_change_24h);
-
-    res.status(200).json({ filteredCoins });
+    const ngnRate = parseFloat(ngnResponse.data.price);
+    const filteredCoins = processCoinData(coinMarketData, ngnRate, true);
+    const response = { filteredCoins };
+    
+    cache.set('topGainersData', response);
+    
+    res.status(200).json(response);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Error fetching data from CoinMarketCap' });
+    const staleCache = cache.get('topGainersData');
+    if (staleCache) {
+      return res.status(200).json(staleCache);
+    }
+    
+    res.status(500).json({ error: 'Error fetching top gainers data' });
   }
 });
+
+async function fetchNGNRate() {
+  return axios.get('https://api.binance.com/api/v3/ticker/price', {
+    params: { symbol: 'USDTNGN' },
+    timeout: 10000
+  });
+}
+
+async function fetchCoinMarketCapData() {
+  const response = await fetch('https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listing?start=1&limit=500', {
+    headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`CoinMarketCap API responded with status: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+function processCoinData(coinMarketData, ngnRate, filterGainers) {
+  const result = [];
+  const coins = coinMarketData.data.cryptoCurrencyList;
+  
+  const coinMap = new Map();
+  coins.forEach(coin => {
+    const slugKey = coin.slug.toLowerCase();
+    const nameKey = coin.name.toLowerCase();
+    coinMap.set(slugKey, coin);
+    coinMap.set(nameKey, coin);
+  });
+
+  for (const coinName of COINS_LIST) {
+    const formattedCoinName = coinName.toLowerCase().replace(/\s+/g, '-');
+    const coinSlug = coinMap.get(formattedCoinName);
+    
+    if (coinSlug) {
+      const { name, symbol, quotes } = coinSlug;
+      const usdQuote = quotes.find(quote => quote.name === 'USD') || { price: 0, percentChange24h: 0 };
+      const price = usdQuote.price || 0;
+      const percentChange24h = usdQuote.percentChange24h || 0;
+      
+      if (filterGainers && percentChange24h <= 0) {
+        continue;
+      }
+      
+      const specialCase = COIN_NAME_MAPPING[coinName];
+      const displayName = specialCase ? specialCase.name : name;
+      const displaySymbol = specialCase ? specialCase.symbol : symbol;
+      const imageUrl = IMAGE_URL_MAPPING[coinName] || '';
+      
+      result.push({
+        name: displayName,
+        symbol: displaySymbol,
+        current_price: Number(price) * Number(ngnRate),
+        image: imageUrl,
+        percentage_change_24h: percentChange24h,
+      });
+    }
+  }
+  
+  if (filterGainers) {
+    result.sort((a, b) => b.percentage_change_24h - a.percentage_change_24h);
+  }
+  
+  return result;
+}
 
 app.post('/getSingleCoinBalanceOfUserFromBscScan', async (req, res) => {
   var privateKey = req.body.privateKey;
@@ -1627,7 +1633,7 @@ app.get('/redeemInstructions', async (req, res) => {
 //Airtime
 
 
-server.listen(3000, '192.168.29.65', () => {
-  console.log('Server is running on http://192.168.29.65:3000');
+server.listen(3000, '192.168.29.112', () => {
+  console.log('Server is running on http://192.168.29.112:3000');
 });
 
